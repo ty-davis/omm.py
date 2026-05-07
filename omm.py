@@ -49,16 +49,20 @@ if __name__ == "__main__":
     config.read('devices.ini')
     dev_pid = 0
     dev_idx = -1
+    dev_serial = ''
     if dev_name is None:
         dev_name = config.sections()[0]
+    assert 'pid' in config[dev_name] and 'index' in config[dev_name]
     if dev_name and dev_name in config:
         dev_pid = int(config[dev_name]['pid'], 16)
         dev_idx = int(config[dev_name]['index'], 16)
+        if 'serial' in config[dev_name]:
+            dev_serial = config[dev_name]['serial']
     if dev_pid == 0 or dev_idx < 0:
         print('must set "pid" and "index"')
         exit()
 
-    dev = LogiHPP20(dev_pid, '', [dev_idx]) 
+    dev = LogiHPP20(dev_pid, '', dev_serial, [dev_idx]) 
     omm = FeatureOnboardProfile(dev)
 
     early_exit = toggle_onboard >=0 or enable_mode or toggle_vis >= 0

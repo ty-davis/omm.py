@@ -15,12 +15,13 @@ if sys.platform == 'win32':
 import hid
 
 class LogiHPP20:
-    def __init__(self, pid = 0, name = '', index_list = []):
+    def __init__(self, pid = 0, name = '', serial = '', index_list = []):
         """init hidpp device
 
         Args:
             pid (int): usb pid
             name (str): partial name string
+            serial (str): serial number optional.
             index_list (list, optional): a list of possible connection id. 
                     0 for bluetooth, 0xFF for wired, 1-6 for receiver. Defaults to [0xFF].
         """
@@ -42,17 +43,22 @@ class LogiHPP20:
         devs = hid.enumerate(vid = vid, pid = pid)
         #print(devs)
         for dev in devs:
+            if serial and dev['serial_number'] != serial:
+                continue
             if dev['usage_page'] >= 0xFF00:
                 h = hid.Device(path = dev['path'])
                 data = h.get_report_descriptor()
                 if len(data) > 10 and 0x85 in data:
-                    if data[data.index(0x85)+1] == 0x10:
+                    data_str = data.decode('all-escapes')
+                    if '\\x85\\x10' in data_str:
                         list_short.append((dev['path'], dev['product_id']))
-                    elif data[data.index(0x85)+1] == 0x11:
+                    if  '\\x85\\x11' in data_str:
                         list_long.append((dev['path'], dev['product_id']))
-                    elif data[data.index(0x85)+1] == 0x12: #64bytes??
+                    if  '\\x85\\x12' in data_str: #64bytes??
                         list_very_long.append((dev['path'], dev['product_id']))
                 h.close()
+        list_long = list(set(list_long))
+        #print(list_long)
         path_long, dev_name_hidpp, product_id = self.detect_device(list_long, name, index_list)
         assert list_long and path_long, 'error while opening device!'
         self.port_long = hid.Device(path=path_long)
@@ -69,6 +75,7 @@ class LogiHPP20:
         dev_name_hidpp = ''
         product_id = ''
         for path, pid in long_path_list:
+            #print(path, pid)
             if path_long:
                 break
             dev = hid.Device(path=path)

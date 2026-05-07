@@ -65,7 +65,7 @@ bind modifier key(s) to mouse button
    
    ```
          "action": "macro",
-         "value": "+lctrl -a +a -lctrl"
+         "value": "+lctrl +a -a -lctrl"
    ```
 
   
