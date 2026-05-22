@@ -35,6 +35,28 @@ Press `F12`
       "value": "tab"
 ```
 
+Arrow keys
+
+```
+      "action": "key",
+      "value": "leftarrow"
+```
+
+```
+      "action": "key",
+      "value": "rightarrow"
+```
+
+```
+      "action": "key",
+      "value": "uparrow"
+```
+
+```
+      "action": "key",
+      "value": "downarrow"
+```
+
 bind modifier key(s) to mouse button
 
 ```
